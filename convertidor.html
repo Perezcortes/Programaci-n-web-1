@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor de números reales a representación IEEE 754</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Convertidor de números reales a representación IEEE 754</h1>
+    <form id="converter-form">
+        <label for="number-input">Ingrese un número de tipo number:</label>
+        <input type="number" step="any" id="number-input" name="number" required>
+        <button type="submit">Convertir</button>
+    </form>
+
+    <h2>Parte entera</h2>
+    <table id="result-table">
+        <thead>
+            <tr>
+                <th>Valor</th>
+                <th>Divisor</th>
+                <th>Cociente</th>
+                <th>Residuo</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+    
+    <div id="binary-result" style="margin-top: 20px;"></div> <!-- Resultado de la parte entera -->
+
+    <h2>Parte fraccionaria</h2>
+    <table id="fraction-table">
+        <thead>
+            <tr>
+                <th>Valor</th>
+                <th>Multiplicador</th>
+                <th>Producto</th>
+                <th>Digito</th>
+            </tr>
+        </thead>
+        <tbody id="fraction-table-body"></tbody>
+    </table>
+
+    <script>
+        document.getElementById('converter-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const inputNumber = parseFloat(document.getElementById('number-input').value);
+            const integerPart = Math.floor(inputNumber);
+            const fractionalPart = inputNumber - integerPart;
+
+            // Limpiar la tabla y el resultado previo
+            const tableBody = document.getElementById('table-body');
+            const fractionTableBody = document.getElementById('fraction-table-body');
+            const binaryResult = document.getElementById('binary-result');
+
+            tableBody.innerHTML = '';
+            fractionTableBody.innerHTML = '';
+            binaryResult.innerHTML = '';
+
+            // Parte entera
+            let binary = '';
+            let value = integerPart;
+            while (value > 0) {
+                const divisor = 2;
+                const cociente = Math.floor(value / divisor);
+                const residuo = value % divisor;
+
+                const row = `<tr>
+                    <td>${value}</td>
+                    <td>${divisor}</td>
+                    <td>${cociente}</td>
+                    <td>${residuo}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+
+                binary = residuo + binary;
+                value = cociente;
+            }
+
+            // Mostrar el resultado binario de la parte entera
+            binaryResult.innerHTML = `<strong>Resultado Parte Entera:</strong> ${binary}`;
+
+            // Parte fraccionaria
+            let fractionValue = fractionalPart;
+            let digit;
+            for (let i = 0; i < 4; i++) { // Cambia a 4 o más iteraciones según necesites
+                const multiplier = 2;
+                const product = fractionValue * multiplier;
+                digit = Math.floor(product);
+
+                const fractionRow = `<tr>
+                    <td>${fractionValue}</td>
+                    <td>${multiplier}</td>
+                    <td>${product}</td>
+                    <td>${digit}</td>
+                </tr>`;
+                fractionTableBody.innerHTML += fractionRow;
+
+                // Actualizamos el valor para la siguiente iteración
+                fractionValue = product - digit;
+            }
+        });
+    </script>
+</body>
+</html>
